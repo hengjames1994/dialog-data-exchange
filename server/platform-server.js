@@ -117,33 +117,53 @@ async function writeDb(db) {
   await writeFile(dbFile, JSON.stringify(db, null, 2));
 }
 
-function cleanPackage(input) {
-  const now = new Date().toISOString();
-  const title = String(input.title || "").trim().slice(0, 80);
-  const domain = String(input.domain || "日常").trim().slice(0, 20);
-  const score = Math.max(1, Math.min(100, Number(input.score || 1)));
-  const price = Math.max(1, Math.round(Number(input.price || 1)));
-  const records = Math.max(1, Math.round(Number(input.records || 1)));
-  const license = String(input.license || "评测/研究").trim().slice(0, 30);
-  const seller = String(input.seller || "匿名贡献者").trim().slice(0, 40);
-  const tags = Array.isArray(input.tags) ? input.tags.map((tag) => String(tag).slice(0, 20)).slice(0, 6) : [];
-  const sample = String(input.sample || "").slice(0, 6000);
+function text(input, fallback = "", max = 120) {
+  return String(input || fallback).trim().slice(0, max);
+}
 
+function cleanPackage(input) {
+  const title = text(input.title, "", 80);
   if (!title) throw new Error("数据包名称不能为空");
 
   return {
     id: `pkg-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     title,
-    domain,
-    records,
-    score,
-    price,
-    license,
-    tags,
-    seller,
-    sample,
+    domain: text(input.domain, "日常", 20),
+    records: Math.max(1, Math.round(Number(input.records || 1))),
+    score: Math.max(1, Math.min(100, Number(input.score || 1))),
+    price: Math.max(1, Math.round(Number(input.price || 1))),
+    license: text(input.license, "评测/研究", 30),
+    tags: Array.isArray(input.tags) ? input.tags.map((tag) => text(tag, "", 20)).filter(Boolean).slice(0, 6) : [],
+    seller: text(input.seller, "匿名贡献者", 40),
+    sample: text(input.sample, "", 6000),
     status: "listed",
-    createdAt: now,
+    createdAt: new Date().toISOString(),
+  };
+}
+
+function cleanOrder(input, item) {
+  const buyerCompany = text(input.buyerCompany, "", 80);
+  const buyerName = text(input.buyerName, "", 40);
+  const buyerEmail = text(input.buyerEmail, "", 80);
+  const buyerContact = text(input.buyerContact, "", 80);
+
+  if (!buyerCompany || !buyerName || !buyerEmail || !buyerContact) {
+    throw new Error("请填写公司、联系人、邮箱和微信/电话");
+  }
+
+  return {
+    id: `order-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    packageId: item.id,
+    packageTitle: item.title,
+    amount: item.price,
+    buyerCompany,
+    buyerName,
+    buyerEmail,
+    buyerContact,
+    useCase: text(input.useCase, "模型评测", 40),
+    note: text(input.note, "", 800),
+    status: "purchase-intent",
+    createdAt: new Date().toISOString(),
   };
 }
 
@@ -179,16 +199,7 @@ async function handleApi(request, response, url) {
       return true;
     }
 
-    const order = {
-      id: `order-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-      packageId: item.id,
-      packageTitle: item.title,
-      buyer: String(input.buyer || "模型公司试用账号").slice(0, 60),
-      amount: item.price,
-      status: "pending-payment",
-      createdAt: new Date().toISOString(),
-    };
-
+    const order = cleanOrder(input, item);
     db.orders = [order, ...db.orders];
     await writeDb(db);
     sendJson(response, 201, { order });

@@ -35,14 +35,14 @@
                 <p class="eyebrow">贡献者工作台</p>
                 <h2>上传 AI 对话，生成可交易数据资产</h2>
               </div>
-              <span class="status-pill" id="compliancePill">待授权</span>
+              <span class="status-pill" id="compliancePill">待完善</span>
             </div>
 
             <label class="dropzone" for="uploadInput" id="dropzone">
               <input id="uploadInput" type="file" accept=".json,.txt,.md,.csv" />
               <span class="drop-icon" aria-hidden="true">↑</span>
               <strong>选择或拖入对话文件</strong>
-              <small>支持 JSON、TXT、Markdown、CSV；本演示只在浏览器本地分析</small>
+              <small>支持 JSON、TXT、Markdown、CSV；浏览器本地分析后再发布</small>
             </label>
 
             <label class="field">
@@ -144,6 +144,60 @@
           </article>
         </section>
       </section>
+
+      <dialog class="purchase-dialog" id="purchaseDialog" aria-labelledby="purchaseTitle">
+        <form id="purchaseForm" method="dialog">
+          <div class="dialog-header">
+            <div>
+              <p class="eyebrow">采购意向</p>
+              <h2 id="purchaseTitle">提交采购联系信息</h2>
+            </div>
+            <button class="icon-button" id="closePurchaseBtn" type="button" aria-label="关闭">×</button>
+          </div>
+
+          <div class="purchase-summary" id="purchaseSummary"></div>
+
+          <div class="form-grid">
+            <label class="field">
+              <span>公司/机构名称</span>
+              <input id="buyerCompany" name="company" type="text" placeholder="例如：某某模型科技有限公司" required />
+            </label>
+            <label class="field">
+              <span>联系人</span>
+              <input id="buyerName" name="name" type="text" placeholder="你的姓名" required />
+            </label>
+            <label class="field">
+              <span>邮箱</span>
+              <input id="buyerEmail" name="email" type="email" placeholder="name@company.com" required />
+            </label>
+            <label class="field">
+              <span>微信/电话</span>
+              <input id="buyerContact" name="contact" type="text" placeholder="方便联系你的方式" required />
+            </label>
+          </div>
+
+          <label class="field">
+            <span>采购用途</span>
+            <select id="buyerUseCase" name="useCase">
+              <option>模型评测</option>
+              <option>微调训练</option>
+              <option>商业训练</option>
+              <option>行业研究</option>
+              <option>其他</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>备注</span>
+            <textarea id="buyerNote" name="note" rows="3" placeholder="例如：希望采购 1 万条科研对话，需先看脱敏样本。"></textarea>
+          </label>
+
+          <div class="dialog-actions">
+            <button class="secondary-action" id="cancelPurchaseBtn" type="button">取消</button>
+            <button class="primary-action" id="submitPurchaseBtn" type="submit">提交采购意向</button>
+          </div>
+        </form>
+      </dialog>
 
       <div class="toast" id="toast" role="status" aria-live="polite"></div>
     </main>

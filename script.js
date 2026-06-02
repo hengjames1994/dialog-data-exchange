@@ -79,10 +79,17 @@ const scoreArc = document.querySelector("#scoreArc");
 const priceValue = document.querySelector("#priceValue");
 const priceHint = document.querySelector("#priceHint");
 const compliancePill = document.querySelector("#compliancePill");
+const purchaseDialog = document.querySelector("#purchaseDialog");
+const purchaseForm = document.querySelector("#purchaseForm");
+const purchaseSummary = document.querySelector("#purchaseSummary");
+const closePurchaseBtn = document.querySelector("#closePurchaseBtn");
+const cancelPurchaseBtn = document.querySelector("#cancelPurchaseBtn");
+const submitPurchaseBtn = document.querySelector("#submitPurchaseBtn");
 const toast = document.querySelector("#toast");
 
 let marketItems = loadMarket();
 let latestAnalysis = null;
+let selectedPackage = null;
 
 refreshMarket();
 renderFactors();
@@ -120,7 +127,7 @@ function showToast(message) {
   toast.textContent = message;
   toast.classList.add("is-visible");
   window.clearTimeout(showToast.timer);
-  showToast.timer = window.setTimeout(() => toast.classList.remove("is-visible"), 2600);
+  showToast.timer = window.setTimeout(() => toast.classList.remove("is-visible"), 2800);
 }
 
 async function refreshMarket() {
@@ -268,7 +275,7 @@ function renderMarket() {
           </div>
           <div class="market-price">
             <strong>¥${item.price.toLocaleString("zh-CN")}</strong>
-            <button type="button" data-buy="${item.id}">模拟购买</button>
+            <button type="button" data-buy="${item.id}">采购咨询</button>
           </div>
         </article>
       `
@@ -314,6 +321,22 @@ function renderCompliance() {
       `
     )
     .join("");
+}
+
+function openPurchaseDialog(item) {
+  selectedPackage = item;
+  purchaseSummary.innerHTML = `
+    <strong>${item.title}</strong>
+    <span>${item.domain} · ${item.records.toLocaleString("zh-CN")} 条记录 · ${item.score}分</span>
+    <b>参考价 ¥${item.price.toLocaleString("zh-CN")}</b>
+  `;
+  purchaseForm.reset();
+  purchaseDialog.showModal();
+}
+
+function closePurchaseDialog() {
+  selectedPackage = null;
+  purchaseDialog.close();
 }
 
 async function readUploadedFile(file) {
@@ -385,20 +408,49 @@ resetBtn.addEventListener("click", () => {
 
 marketFilter.addEventListener("change", renderMarket);
 
-marketList.addEventListener("click", async (event) => {
+marketList.addEventListener("click", (event) => {
   const button = event.target.closest("[data-buy]");
   if (!button) return;
   const item = marketItems.find((entry) => entry.id === button.dataset.buy);
+  if (item) openPurchaseDialog(item);
+});
+
+purchaseForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (!selectedPackage) return;
+
+  submitPurchaseBtn.disabled = true;
+  submitPurchaseBtn.textContent = "提交中...";
+
+  const payload = {
+    packageId: selectedPackage.id,
+    buyerCompany: document.querySelector("#buyerCompany").value.trim(),
+    buyerName: document.querySelector("#buyerName").value.trim(),
+    buyerEmail: document.querySelector("#buyerEmail").value.trim(),
+    buyerContact: document.querySelector("#buyerContact").value.trim(),
+    useCase: document.querySelector("#buyerUseCase").value,
+    note: document.querySelector("#buyerNote").value.trim(),
+  };
 
   try {
-    const payload = await apiFetch("/api/orders", {
+    const result = await apiFetch("/api/orders", {
       method: "POST",
-      body: JSON.stringify({ packageId: item.id, buyer: "模型公司试用账号" }),
+      body: JSON.stringify(payload),
     });
-    showToast(`订单 ${payload.order.id.slice(-6)} 已创建，等待付款`);
-  } catch {
-    showToast(`${item.title} 已加入买方采购清单`);
+    closePurchaseDialog();
+    showToast(`采购意向已提交，订单号 ${result.order.id.slice(-6)}`);
+  } catch (error) {
+    showToast(error.message || "提交失败，请稍后再试");
+  } finally {
+    submitPurchaseBtn.disabled = false;
+    submitPurchaseBtn.textContent = "提交采购意向";
   }
+});
+
+closePurchaseBtn.addEventListener("click", closePurchaseDialog);
+cancelPurchaseBtn.addEventListener("click", closePurchaseDialog);
+purchaseDialog.addEventListener("click", (event) => {
+  if (event.target === purchaseDialog) closePurchaseDialog();
 });
 
 uploadInput.addEventListener("change", (event) => {
