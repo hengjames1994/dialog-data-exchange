@@ -1,0 +1,22 @@
+{
+  "name": "dialog-data-exchange",
+  "version": "1.0.0",
+  "description": "AI 对话数据资产交易中心 MVP",
+  "scripts": {
+    "build": "npm run prepare:web",
+    "start": "node server/platform-server.js",
+    "prepare:web": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"New-Item -ItemType Directory -Force www | Out-Null; Copy-Item index.html,styles.css,script.js,manifest.webmanifest,sw.js -Destination www -Force\"",
+    "cap:add:ios": "npm run prepare:web && npx cap add ios",
+    "cap:sync:ios": "npm run prepare:web && npx cap sync ios",
+    "sync:ios": "npx cap sync ios",
+    "open:ios": "npx cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/core": "^7.4.4",
+    "@capacitor/ios": "^7.4.4",
+    "@capacitor/push-notifications": "^7.0.6"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.4.4"
+  }
+}

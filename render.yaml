@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: dialog-data-exchange
+    env: node
+    buildCommand: npm run build
+    startCommand: npm start
+    disk:
+      name: dialog-data
+      mountPath: /opt/render/project/src/server/data
+      sizeGB: 1

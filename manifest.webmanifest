@@ -1,0 +1,9 @@
+{
+  "name": "数语交易中心",
+  "short_name": "数语",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f6f8fb",
+  "theme_color": "#f6f8fb",
+  "lang": "zh-CN"
+}

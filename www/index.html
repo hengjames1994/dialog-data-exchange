@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f6f8fb" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="数语交易中心" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <title>数语交易中心</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="workspace" aria-label="AI 对话数据交易中心">
+        <header class="topbar">
+          <div class="brand-block">
+            <span class="brand-mark" aria-hidden="true">数</span>
+            <div>
+              <p class="eyebrow">AI Conversation Data Exchange</p>
+              <h1>数语交易中心</h1>
+            </div>
+          </div>
+          <div class="top-actions">
+            <button class="icon-button" id="resetBtn" type="button" title="重置演示数据" aria-label="重置演示数据">↻</button>
+            <button class="primary-action compact" id="publishBtn" type="button">发布数据包</button>
+          </div>
+        </header>
+
+        <section class="hero-grid">
+          <article class="upload-panel">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">贡献者工作台</p>
+                <h2>上传 AI 对话，生成可交易数据资产</h2>
+              </div>
+              <span class="status-pill" id="compliancePill">待授权</span>
+            </div>
+
+            <label class="dropzone" for="uploadInput" id="dropzone">
+              <input id="uploadInput" type="file" accept=".json,.txt,.md,.csv" />
+              <span class="drop-icon" aria-hidden="true">↑</span>
+              <strong>选择或拖入对话文件</strong>
+              <small>支持 JSON、TXT、Markdown、CSV；本演示只在浏览器本地分析</small>
+            </label>
+
+            <label class="field">
+              <span>也可以直接粘贴一段对话</span>
+              <textarea id="conversationInput" rows="8" placeholder="用户：帮我评估这篇论文的方法论&#10;AI：我们可以从实验设计、变量控制、统计检验三方面看..."></textarea>
+            </label>
+
+            <div class="controls-row">
+              <label class="field">
+                <span>上传者身份</span>
+                <select id="contributorType">
+                  <option value="researcher">科研/专家认证</option>
+                  <option value="developer">开发者</option>
+                  <option value="enterprise">企业团队</option>
+                  <option value="consumer">普通用户</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>授权范围</span>
+                <select id="licenseScope">
+                  <option value="evaluation">仅评测/研究</option>
+                  <option value="fine-tune">微调训练</option>
+                  <option value="commercial">商业训练</option>
+                  <option value="exclusive">定向独家授权</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="consent-box">
+              <label>
+                <input id="consentCheck" type="checkbox" />
+                <span>我确认拥有上传数据的授权，并同意平台进行脱敏、评分、标签化和交易撮合。</span>
+              </label>
+              <label>
+                <input id="privacyCheck" type="checkbox" />
+                <span>我确认数据中不含未授权的个人隐私、商业秘密、医疗金融敏感信息。</span>
+              </label>
+            </div>
+
+            <button class="primary-action" id="scoreBtn" type="button">分析并估价</button>
+          </article>
+
+          <aside class="score-panel" aria-label="评分结果">
+            <div class="score-ring">
+              <svg viewBox="0 0 120 120" aria-hidden="true">
+                <circle cx="60" cy="60" r="52"></circle>
+                <circle id="scoreArc" cx="60" cy="60" r="52"></circle>
+              </svg>
+              <div>
+                <strong id="scoreValue">--</strong>
+                <span>质量分</span>
+              </div>
+            </div>
+            <div class="price-card">
+              <span>预估成交价</span>
+              <strong id="priceValue">¥ --</strong>
+              <small id="priceHint">上传或粘贴对话后生成报价</small>
+            </div>
+            <div class="metric-list" id="metricList"></div>
+          </aside>
+        </section>
+
+        <section class="dashboard-grid">
+          <article class="panel">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">市场</p>
+                <h2>数据包交易大厅</h2>
+              </div>
+              <select id="marketFilter" aria-label="筛选数据包">
+                <option value="all">全部领域</option>
+                <option value="科研">科研</option>
+                <option value="编程">编程</option>
+                <option value="办公">办公</option>
+                <option value="教育">教育</option>
+              </select>
+            </div>
+            <div class="market-list" id="marketList"></div>
+          </article>
+
+          <article class="panel">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">定价引擎</p>
+                <h2>质量评分拆解</h2>
+              </div>
+            </div>
+            <div class="factor-list" id="factorList"></div>
+          </article>
+
+          <article class="panel">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">合规</p>
+                <h2>交易前置检查</h2>
+              </div>
+            </div>
+            <div class="compliance-list" id="complianceList"></div>
+          </article>
+        </section>
+      </section>
+
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
